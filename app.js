@@ -124,10 +124,13 @@ app.post("/upgrade", async (req, res, next) => {
   }
 })
 
-app.get("/messages", async (req, res) => {
+app.get("/messages", async (req, res, next) => {
   try {
-    posts = await pool.query("SELECT * FROM post;")
-    res.render("messages", { posts: posts['rows'] });
+    posts = await pool.query(`SELECT post.id, firstname, lastname, created_at, title, content 
+      FROM post
+      JOIN users ON users.id = post.user_id
+      ORDER BY created_at DESC;`)
+    res.render("messages", { posts: posts['rows'], user: req.user });
   } catch (error) {
     console.error(error);
     next(error);
@@ -145,4 +148,15 @@ app.post("/messages", async (req, res, next) => {
   next(error);
   }
 })
+
+app.post('/delete-post/:id', async (req, res, next) => {
+  try {
+    await pool.query("DELETE FROM post WHERE id = $1", [req.params.id]);
+    res.redirect("/messages");
+  } catch (error) {
+  console.error(error);
+  next(error);
+  }
+});
+
 app.listen(3000, () => console.log("app listening on port 3000!"));
