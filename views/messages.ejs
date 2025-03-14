@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages</title>
+</head>
+<body>
+    <div class="posts">
+        <% if (posts) { %>
+            <% posts.forEach(function(post) { %>
+                <div class="post" style="background-color: aquamarine;">
+                    <h3><%= post.title %> by User <%=post.user_id %></h3>
+                    <p><%= post.created_at %></p>
+                    <p><%= post.content %></p>
+                </div>
+            <% }); %>
+    <% } else { %>
+        <p>Its empty for now</p>
+        <% }; %>
+    </div>
+    <div>
+        <h3>Create a post:</h3>
+        <form action="/messages" method="POST">
+            <label for="title">Ttile:</label>
+            <input type="text" id="title" name="title" required>
+            <br>
+            <label for="content">Content:</label>
+            <textarea id="content" name="content" rows="5" cols="50" required></textarea>
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

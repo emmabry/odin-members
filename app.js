@@ -83,7 +83,9 @@ app.post("/sign-up", validateUser, async (req, res, next) => {
     }
     try {
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
-      await pool.query("insert into users (firstname, lastname, username, password, membership) values ($1, $2, $3, $4, $5)", [req.body.firstname, req.body.lastname, req.body.email, hashedPassword, "basic"]);
+      await pool.query(`insert into users (firstname, lastname, username, password, membership) 
+        values ($1, $2, $3, $4, $5)`, 
+        [req.body.firstname, req.body.lastname, req.body.email, hashedPassword, "basic"]);
       res.redirect("/");
      } catch (error) {
         console.error(error);
@@ -110,4 +112,37 @@ app.get("/log-out", (req, res, next) => {
   });
 });
 
+app.post("/upgrade", async (req, res, next) => {
+  if (req.body.code == "secret") {
+    try {
+      await pool.query("UPDATE users SET membership = $1 WHERE id = $2", ["premium", req.user.id]);
+      res.redirect("/");
+    } catch (error) {
+    console.error(error);
+    next(error);
+   }
+  }
+})
+
+app.get("/messages", async (req, res) => {
+  try {
+    posts = await pool.query("SELECT * FROM post;")
+    res.render("messages", { posts: posts['rows'] });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+app.post("/messages", async (req, res, next) => {
+  try {
+    await pool.query(`INSERT INTO post (user_id, title, content) 
+      VALUES ($1, $2, $3)`,
+    [req.user.id, req.body.title, req.body.content]);
+    res.redirect("/messages");
+  } catch (error) {
+  console.error(error);
+  next(error);
+  }
+})
 app.listen(3000, () => console.log("app listening on port 3000!"));

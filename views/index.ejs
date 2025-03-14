@@ -8,6 +8,15 @@
 <body>
     <% if (locals.user) {%>
         <h1>WELCOME BACK <%= user.username %></h1>
+        <a href="/messages">Messageboard</a>
+        <p>Your membership status is <%= user.membership %></p>
+        <p>Enter your code to upgrade your membership:</p>
+        <form action="/upgrade" method="POST">
+            <label for="code">Code:</label>
+            <input type="text" id="code" name="code" required>
+            <br>
+            <button type="submit">Submit</button>
+        </form>
         <a href="/log-out">LOG OUT</a>
     <% } else { %>
         <h1>please log in or sign up</h1>
